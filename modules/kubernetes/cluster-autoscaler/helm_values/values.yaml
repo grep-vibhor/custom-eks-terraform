@@ -1,0 +1,28 @@
+# https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#what-are-the-parameters-to-ca
+
+replicaCount: ${replicas}
+
+image:
+  tag: ${image_tag}
+
+awsRegion: ${aws_region}
+
+autoDiscovery:
+  clusterName: ${eks_cluster_id}
+extraArgs:
+  aws-use-static-instance-list: true
+  expander: least-waste
+  scale-down-delay-after-add: 2m0s
+  scale-down-unneeded-time: 2m0s
+  skip-nodes-with-system-pods: false
+  skip-nodes-with-local-storage: false
+  balance-similar-node-groups: true
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+

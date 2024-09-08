@@ -1,0 +1,7 @@
+# https://github.com/aws-ia/terraform-aws-eks-blueprints/blob/main/modules/kubernetes-addons/aws-load-balancer-controller/values.yaml
+
+clusterName: ${eks_cluster_id}
+enableBackendSecurityGroup: ${enableBackendSecurityGroup}
+region: ${aws_region}
+image:
+  repository: ${repository}

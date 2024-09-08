@@ -1,0 +1,150 @@
+# https://github.com/bitnami/charts/blob/main/bitnami/argo-cd/values.yaml
+global:
+  storageClass: "encrypted-disk"
+
+
+controller:
+  replicaCount: ${controller_replicas}
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 500Mi
+  nodeSelector:
+    ${node_selector_key}: ${node_selector_value}
+  tolerations:
+    - key: ${tolerations_key}
+      operator: Equal
+      value: ${tolerations_value}
+      effect: NoSchedule
+
+
+
+server:
+  replicaCount: ${server_replicas}
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 1000m
+      memory: 1Gi
+
+  insecure: true
+
+  logFormat: text
+  logLevel: info
+  configEnabled: true
+  url: ${argocd_full_domain_path}
+
+
+  config:
+    url: "{{ .Values.server.url }}"
+    application.instanceLabelKey: argocd.argoproj.io/instance
+    ## If Dex is enabled you need to add connectors here
+    ## dex.config: |
+    ##  connectors: []
+    ##
+    dex.config: ""
+
+  ingress:
+    enabled: true
+    selfSigned: false
+    pathType: Prefix
+    apiVersion: ""
+    hostname: ${argocd_dns_name}
+    path: /argocd
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/scheme: internal
+      alb.ingress.kubernetes.io/subnets: ${load_balancer_subnets}
+      alb.ingress.kubernetes.io/security-groups: ${load_balancer_security_groups}
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/healthcheck-path: /argocd
+      alb.ingress.kubernetes.io/success-codes: '301'
+      alb.ingress.kubernetes.io/group.name: ${load_balancer_identifier}
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
+      alb.ingress.kubernetes.io/certificate-arn: ${argocd_dns_cert_arn}
+      alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+
+    tls: false
+
+    ## The list of additional hostnames to be covered with this ingress record.
+    ## Most likely the hostname above will be enough, but in the event more hosts are needed, this is an array
+    extraHosts: []
+    ## - name: argocd.server.local
+    ##   path: /
+    ##
+
+    ## Any additional arbitrary paths that may need to be added to the ingress under the main host.
+    ## For example: The ALB ingress controller requires a special rule for handling SSL redirection.
+    extraPaths:
+      - path: /argocd
+        pathType: Prefix
+        backend:
+          service:
+            name: ssl-redirect
+            port:
+              name: use-annotation
+
+  extraArgs:
+    - --rootpath
+    - "/argocd"
+
+  nodeSelector:
+    ${node_selector_key}: ${node_selector_value}
+  tolerations:
+    - key: ${tolerations_key}
+      operator: Equal
+      value: ${tolerations_value}
+      effect: NoSchedule
+
+repoServer:
+  replicaCount: ${repoServer_replicas}
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 500Mi
+  nodeSelector:
+    ${node_selector_key}: ${node_selector_value}
+  tolerations:
+    - key: ${tolerations_key}
+      operator: Equal
+      value: ${tolerations_value}
+      effect: NoSchedule
+
+## Dex configuration
+##
+dex:
+  image:
+    registry: docker.io
+    repository: bitnami/dex
+    tag: 2.37.0-debian-11-r22
+    digest: ""
+
+    pullPolicy: IfNotPresent
+
+    pullSecrets: []
+    ## Enable debug mode
+    ##
+    debug: false
+  enabled: false
+  replicaCount: 1
+  nodeSelector:
+    ${node_selector_key}: ${node_selector_value}
+  tolerations:
+    - key: ${tolerations_key}
+      operator: Equal
+      value: ${tolerations_value}
+      effect: NoSchedule
+
+redis:
+  auth:
+    enabled: false
+  persistence:
+    size: 2Gi

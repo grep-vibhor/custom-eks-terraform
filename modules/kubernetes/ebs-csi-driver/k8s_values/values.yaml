@@ -1,0 +1,25 @@
+controller:
+  serviceAccount:
+     annotations:
+        eks.amazonaws.com/role-arn: "${ebs_role_arn}"   
+node:
+  serviceAccount:
+     annotations:     
+        eks.amazonaws.com/role-arn: "${ebs_role_arn}"
+
+storageClasses:
+  - name: encrypted-disk
+    annotations:
+      storageclass.kubernetes.io/is-default-class: "true"
+    provisioner: ebs.csi.aws.com
+    parameters:
+      csi.storage.k8s.io/fstype: "${csi_file_system}"
+      encrypted: 'true'
+      kmsKeyId: "${kms_key_arn}"
+      type: gp3
+    reclaimPolicy: Delete
+    allowVolumeExpansion: true
+    volumeBindingMode: WaitForFirstConsumer
+    
+
+  

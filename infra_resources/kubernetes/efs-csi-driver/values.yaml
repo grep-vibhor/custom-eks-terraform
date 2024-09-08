@@ -1,0 +1,5 @@
+storageClasses:
+  - name: efs-sc
+    provisioner: efs.csi.aws.com
+    reclaimPolicy: Retain
+    volumeBindingMode: Immediate
