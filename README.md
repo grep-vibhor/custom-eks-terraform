@@ -1,5 +1,81 @@
 # EKS Infra
 This terraform code creates a customised EKS infra with VPC prerequisites and some applications on top of infra like argocd.
+It has some custom created modules but specifically for eks we take help from [eks-blueprints](https://github.com/aws-ia/terraform-aws-eks-blueprints/tree/v4.32.1) provide by aws community.
+
+
+## Directory Structure
+```
+.
+├── README.md
+├── docs  # contains the dpc files and deployment steps
+├── infra_resources      # contains the actual resources
+│   ├── acm
+│   │   └── terragrunt.hcl
+│   ├── argocd
+│   │   └── terragrunt.hcl
+│   ├── backend.tf
+│   ├── ebs-csi-driver-role
+│   │   ├── templates
+│   │   │   └── ebs-csi-driver-managed-policy.tpl
+│   │   └── terragrunt.hcl
+│   ├── eks
+│   │   └── terragrunt.hcl
+│   ├── eks-worker-node-role
+│   │   └── terragrunt.hcl
+│   ├── global.hcl
+│   ├── internal_alb_security_group
+│   │   └── terragrunt.hcl
+│   ├── kms
+│   │   └── terragrunt.hcl
+│   ├── kubernetes
+│   │   ├── aws-load-balancer-controller
+│   │   │   └── terragrunt.hcl
+│   │   ├── cluster-autoscaler
+│   │   │   └── terragrunt.hcl
+│   │   ├── ebs_csi_driver
+│   │   │   └── terragrunt.hcl
+│   │   ├── efs-csi-driver
+│   │   │   ├── terragrunt.hcl
+│   │   │   └── values.yaml
+│   │   ├── kube-proxy
+│   │   │   └── terragrunt.hcl
+│   │   └── vpc-cni
+│   │       └── terragrunt.hcl
+│   ├── nodegroups
+│   │   └── devops
+│   │       └── terragrunt.hcl
+│   ├── terragrunt.hcl
+│   └── vpc
+│       └── terragrunt.hcl
+└── modules # contains the terraform modules
+    ├── aws
+    │   ├── acm
+    │   ├── efs
+    │   ├── iam
+    │   │   ├── README.md
+    │   │   ├── iam-role
+    │   │   └── iam-user
+    │   ├── kms
+    │   ├── security_group
+    │   └── vpc
+    │       ├── README.md
+    │       ├── main.tf
+    │       ├── modules
+    │       │   └── terraform-aws-vpc
+    │       │       └── vpc-flow-logs.tf
+    └── kubernetes
+        ├── argocd
+        ├── aws-load-balancer-controller
+        ├── cluster-autoscaler
+        ├── ebs-csi-driver
+        ├── efs-csi-driver
+        ├── kube-proxy
+        └── vpc-cni
+```
+
+
+## Backend
+Code uses S3 backend whose config can be found in `infra_resources/terragrunt.hcl` file
 
 ## **Network Architecture**
 

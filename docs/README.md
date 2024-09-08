@@ -9,12 +9,20 @@
 
 ## Step 1. Uptil EKS with Node Groups:
 ```bash
+cd infra_resources
+```
+
+```bash
 terragrunt run-all plan --terragrunt-non-interactive --terragrunt-include-dir  ./acm --terragrunt-non-interactive --terragrunt-include-dir  ./vpc --terragrunt-include-dir  ./eks-worker-node-role  --terragrunt-include-dir ./internal_alb_security_group --terragrunt-include-dir  ./kms  --terragrunt-include-dir  ./eks --terragrunt-include-dir  ./ebs-csi-driver-role --terragrunt-include-dir ./nodegroups/devops/
 ```
 
 
 
 ## Step 2. At this point Create Peering connnection for admin-vpc-eks-vpc
+
+```bash
+cd infra_resources
+```
 
 ```
 --  1st plan group
@@ -33,6 +41,11 @@ Group 3
 ```
 
 ```bash
+cd infra_resources
+```
+
+
+```bash
 terragrunt run-all apply --terragrunt-non-interactive --terragrunt-include-dir  ./acm --terragrunt-include-dir   ./eks-worker-node-role --terragrunt-include-dir ./internal_alb_security_group --terragrunt-include-dir  ./kms  --terragrunt-include-dir  ./eks --terragrunt-include-dir  ./ebs-csi-driver-role --terragrunt-include-dir ./nodegroups/devops/
 ```
 
@@ -42,6 +55,10 @@ terragrunt run-all apply --terragrunt-non-interactive --terragrunt-include-dir  
 ###### Optional:
 
 ```bash
+cd infra_resources
+```
+
+```bash
 aws eks update-kubeconfig --name publitas-dev-cluster --region $AWS_REGION
 kubectl config get-contexts
 kubectl config current-context
@@ -49,6 +66,10 @@ kubectl cluster-info
 ```
 
 ## Step 3. Deploy APPS except ARGOCD because argocd requires other apps especially cluster autoscaler 
+
+```bash
+cd infra_resources
+```
 
 ```bash
 terragrunt  run-all apply --terragrunt-include-dir ./kubernetes/aws-load-balancer-controller/ --terragrunt-include-dir ./kubernetes/cluster-autoscaler/ --terragrunt-include-dir ./kubernetes/ebs_csi_driver/ --terragrunt-include-dir ./kubernetes/efs-csi-driver/ --terragrunt-include-dir ./kubernetes/kube-proxy/ --terragrunt-include-dir ./kubernetes/vpc-cni/
@@ -83,6 +104,12 @@ Group 4
 ## Step 4. Update AWS LOAD BALANCER IRSA role with addtags permission
 
 ## Step 5. For argocd-
+
+```bash
+cd infra_resources
+```
+
+
 ```bash
    terragrunt run-all  plan  --terragrunt-non-interactive --terragrunt-exclude-dir ./kubernetes/aws-load-balancer-controller
    terragrunt run-all  apply  --terragrunt-non-interactive --terragrunt-exclude-dir ./kubernetes/aws-load-balancer-controller
